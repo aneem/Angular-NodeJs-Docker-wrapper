@@ -1,0 +1,19 @@
+{
+  "type": "mariadb",
+  "host": "mariadb",
+  "port": 3306,
+  "username": "root",
+  "password": "9YHJbBZR6HynFhN",
+  "database": "myproject",
+  "synchronize": true,
+  "migrationsRun": true,
+  "entities": ["src/entity/**/*{.ts,.js}"],
+  "migrations": ["src/migration/**/*{.ts,.js}"],
+  "subscribers": ["src/subscriber/**/*"],
+  "logging": "all",
+  "cli": {
+    "entitiesDir": "src/entity",
+    "migrationsDir": "src/migration",
+    "subscribersDir": "src/subscriber"
+  }
+}

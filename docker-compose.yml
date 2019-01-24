@@ -1,0 +1,61 @@
+version: '3.5'
+
+services:
+  mariadb:
+    container_name: ${ENV}_${PROJECT_NAME}_mariadb
+    image: mariadb:10.3
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - '13306:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=9YHJbBZR6HynFhN
+      - MYSQL_DATABASE=${PROJECT_NAME}
+      - MYSQL_USER=${PROJECT_NAME}
+      - MYSQL_PASSWORD=8UHrqwyFM4vLQLp
+    restart: always
+    networks:
+      - default
+    # command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+
+  frontend:
+    container_name: ${ENV}_${PROJECT_NAME}_frontend
+    build: ./frontend
+    image: ${ENV}_${PROJECT_NAME}_frontend
+    volumes:
+      - ./frontend/code/src:/var/www/frontend/src
+    working_dir: /var/www/frontend
+    networks:
+      - default
+
+  nginx:
+    container_name: ${ENV}_${PROJECT_NAME}_nginx
+    image: nginx:1.15-alpine
+    restart: always
+    links:
+      - backend:backend
+      - frontend:frontend
+    networks:
+      - default
+
+  backend:
+    container_name: ${ENV}_${PROJECT_NAME}_backend
+    build: ./backend
+    image: ${ENV}_${PROJECT_NAME}_backend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./backend/code/src:/usr/local/api/src
+    restart: always
+    networks:
+      - default
+    depends_on:
+      - mariadb
+
+networks:
+  default:
+    name: ${PROJECT_NAME}_default
+    driver: bridge
+
+volumes:
+  db:
+    name: ${PROJECT_NAME}_db

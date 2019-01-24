@@ -1,0 +1,38 @@
+<div class="app-full-height" fxLayout="row" fxLayoutAlign="center center" fxFlexFill>
+  <nz-card style="width:350px;">
+    <img src="assets/calorie-meter.png" class="calorie-image" alt="Calorie Meter" />
+    <form nz-form [formGroup]="validateForm" class="login-form" fxLayout="column" fxLayoutAlign="start stretch">
+      <nz-divider nzText="Login"></nz-divider>
+      <nz-form-item>
+        <nz-form-control>
+          <nz-input-group [nzPrefix]="prefixUser">
+            <input type="text" nz-input formControlName="userName" placeholder="Username" />
+          </nz-input-group>
+          <nz-form-explain *ngIf="validateForm.get('userName').dirty && validateForm.get('userName').errors"
+            >Please input your username!</nz-form-explain
+          >
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control>
+          <nz-input-group [nzPrefix]="prefixLock">
+            <input type="password" nz-input formControlName="password" placeholder="Password" />
+          </nz-input-group>
+          <nz-form-explain *ngIf="validateForm.get('password').dirty && validateForm.get('password').errors"
+            >Please input your Password!</nz-form-explain
+          >
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control>
+          <!-- <label nz-checkbox formControlName="remember"> <span>Remember me</span> </label> -->
+          <button nz-button class="login-form-button" [nzType]="'primary'" (click)="onSubmit()">Log in</button>
+          <a (click)="forgotPassword()">Forgot password?</a>
+          <a class="login-form-register" (click)="register()">Register now!</a>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+    <ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
+    <ng-template #prefixLock><i nz-icon type="lock"></i></ng-template>
+  </nz-card>
+</div>

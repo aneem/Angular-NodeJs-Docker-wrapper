@@ -1,0 +1,20 @@
+:host ::ng-deep .demo-loadmore-list {
+  min-height: 350px;
+}
+:host ::ng-deep .loadmore {
+  text-align: center;
+  margin-top: 12px;
+  height: 32px;
+  line-height: 32px;
+}
+.green-background{
+  background: #00FF0005;
+  height: 100%;
+  padding: 20px
+}
+
+.red-background{
+  background: #FF000005;
+  padding: 20px
+
+}

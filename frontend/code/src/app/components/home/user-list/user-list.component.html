@@ -1,0 +1,244 @@
+<!-- table -->
+<nz-table
+  #table
+  [nzData]="tableConfig.dataSet"
+  [nzSize]="tableConfig.size"
+  [nzTitle]="tableTitle"
+  [nzBordered]="tableConfig.bordered"
+  [nzLoading]="tableConfig.loading"
+>
+  <thead (nzSortChange)="tableConfig.onSortChange($event)">
+    <tr>
+      <th nzShowSort nzSortKey="firstName">Name</th>
+      <th nzShowSort nzSortKey="email">Email</th>
+      <th nzShowSort nzSortKey="userName">User Name</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of table.data">
+      <td>{{ data.firstName + (data.middleName ? ' ' + data.middleName + ' ' : ' ') + data.lastName | titlecase }}</td>
+      <td>{{ data.email }}</td>
+      <td>{{ data.userName }}</td>
+      <td>
+        <a (click)="modalConfig.helpers.execute('read', data)"> View </a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a (click)="modalConfig.helpers.execute('update', data)">Edit</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a (click)="modalConfig.helpers.execute('delete', data)">Delete</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a (click)="modalConfig.helpers.execute('resetPassword', data)">Reset Password</a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+
+<!-- modal -->
+
+<nz-modal
+  [(nzVisible)]="modalConfig.state.visible"
+  [nzTitle]="modalConfig.state.title"
+  (nzOnCancel)="modalConfig.events.cancel()"
+  (nzOnOk)="modalConfig.events.ok()"
+  [nzOkLoading]="modalConfig.state.isOkLoading"
+  [nzMaskClosable]="modalConfig.state.nzMaskClosable"
+  [nzOkText]="modalConfig.state.nzOkText"
+  [nzOkType]="modalConfig.state.nzOkType"
+>
+  <div *ngIf="false; else modal"></div>
+</nz-modal>
+
+<!-- templates -->
+<!-- table heading -->
+<ng-template #tableTitle>
+  <strong>Manage Users</strong>
+  <button
+    class="right"
+    nz-button
+    nzSize="small"
+    nzType="primary"
+    nzShape="circle"
+    (click)="modalConfig.helpers.execute('create')"
+  >
+    <i nz-icon type="plus"></i>
+  </button>
+</ng-template>
+
+<!-- modal content -->
+<ng-template #modal>
+  <div
+    *ngIf="
+      modalConfig.state.calleeFn == 'create' ||
+      modalConfig.state.calleeFn == 'update' ||
+      modalConfig.state.calleeFn == 'read'
+    "
+    fxLayout="row"
+    fxLayoutAlign="center center"
+    fxFlexFill
+  >
+    <form nz-form [formGroup]="modalForm.state.form" class="login-form" fxLayout="column" fxLayoutAlign="start stretch">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>First Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="text" nz-input formControlName="firstName" placeholder="John" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="modalForm.state.form.get('firstName').dirty && modalForm.state.form.get('firstName').errors"
+          >
+            <ng-container *ngIf="modalForm.state.form.get('firstName').hasError('required')">
+              Please input your first name!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('firstName').hasError('maxlength')">
+              FirstName should be at max
+              {{ modalForm.state.form.get('firstName').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10">Middle Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group> <input type="text" nz-input formControlName="middleName" /> </nz-input-group>
+          <nz-form-explain
+            *ngIf="modalForm.state.form.get('middleName').dirty && modalForm.state.form.get('middleName').errors"
+          >
+            <ng-container *ngIf="modalForm.state.form.get('middleName').hasError('required')">
+              Please input your middle name!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('middleName').hasError('maxlength')">
+              MiddleName should be at max
+              {{ modalForm.state.form.get('middleName').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Last Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group> <input type="text" nz-input formControlName="lastName" placeholder="Doe" /> </nz-input-group>
+          <nz-form-explain
+            *ngIf="modalForm.state.form.get('lastName').dirty && modalForm.state.form.get('lastName').errors"
+          >
+            <ng-container *ngIf="modalForm.state.form.get('lastName').hasError('required')">
+              Please input your last name!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('lastName').hasError('maxlength')">
+              LastName should be at max
+              {{ modalForm.state.form.get('lastName').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Email</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="text" nz-input formControlName="email" placeholder="john.doe@gmail.com" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="
+              (modalForm.state.form.get('email').dirty && modalForm.state.form.get('email').errors) ||
+              modalForm.state.form.get('email').pending
+            "
+          >
+            <ng-container *ngIf="modalForm.state.form.get('email').hasError('required')">
+              Please input your email!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('email').hasError('duplicated')">
+              This email is already registered!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('email').pending"> Validating... </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('email').hasError('email')">
+              The input is not valid E-mail!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('email').hasError('required')">
+              Please provide a valid email!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('email').hasError('maxlength')">
+              Email should be at max
+              {{ modalForm.state.form.get('email').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>User Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="text" nz-input formControlName="userName" placeholder="john.doe" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="
+              (modalForm.state.form.get('userName').dirty && modalForm.state.form.get('userName').errors) ||
+              modalForm.state.form.get('userName').pending
+            "
+          >
+            <ng-container *ngIf="modalForm.state.form.get('userName').hasError('required')">
+              Please input your username!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('userName').hasError('duplicated')">
+              The username is already registered!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('userName').hasError('invalidUserNameCharCheck')">
+              {{ modalForm.state.form.get('userName').getError('invalidUserNameCharCheck')['message'] }}
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('userName').pending"> Validating... </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('userName').hasError('maxlength')">
+              UserName should be at max
+              {{ modalForm.state.form.get('userName').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item *ngIf="modalConfig.state.calleeFn == 'create'">
+        <nz-form-label [nzSpan]="10" nzRequired>Password</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="password" nz-input formControlName="password" placeholder="your secret" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="modalForm.state.form.get('password').dirty && modalForm.state.form.get('password').errors"
+          >
+            <ng-container *ngIf="modalForm.state.form.get('password').hasError('required')">
+              Please input your password!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('password').hasError('minlength')">
+              Password should have at least
+              {{ modalForm.state.form.get('password').getError('minlength')['requiredLength'] }} characters!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('password').hasError('maxlength')">
+              Password should be at max
+              {{ modalForm.state.form.get('password').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Role</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-select formControlName="role" nzPlaceHolder="Choose">
+            <nz-option
+              *ngFor="let role of modalForm.state.roles"
+              [nzLabel]="role.name"
+              [nzValue]="role.value"
+            ></nz-option>
+          </nz-select>
+          <nz-form-explain *ngIf="modalForm.state.form.get('role').dirty && modalForm.state.form.get('role').errors"
+            >Please input your role!
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </div>
+  <div *ngIf="modalConfig.state.calleeFn == 'delete'">
+    <i nz-icon class="warning-color size-24px" type="exclamation-circle"></i> Are you sure you want to delete user
+    <b>{{ modalForm.state.form.get('userName').value }}</b> ?
+  </div>
+  <div *ngIf="modalConfig.state.calleeFn == 'resetPassword'">
+    <i nz-icon class="warning-color size-24px" type="question-circle"></i> Are you sure you want to reset password for
+    user <b>{{ modalForm.state.form.get('userName').value }}</b> ?
+  </div>
+</ng-template>

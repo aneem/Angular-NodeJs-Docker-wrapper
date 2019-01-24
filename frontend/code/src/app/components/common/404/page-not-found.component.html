@@ -1,0 +1,11 @@
+<div class="wrapper app-full-height" fxLayout="row" fxLayoutAlign="end center">
+
+  <div fxFlex="50" class="error-div">
+    <h1 class="h1">404</h1>
+    <h1>There's nothing here!</h1>
+    <h3>Not all who wander are lost. But you certainly are</h3>
+    <button type="button" (click)="goBack()">Go Back</button>
+    &nbsp;&nbsp;
+    <button type="button" *ngIf="session.isAuthenticated()" (click)="goHome()">Go Home</button>
+  </div>
+</div>

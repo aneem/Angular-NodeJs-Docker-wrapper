@@ -1,0 +1,253 @@
+<nz-collapse nzAccordion>
+  <nz-collapse-panel [nzActive]="true" [nzHeader]="userForm.state.title" *ngIf="session.isAdmin">
+    <form nz-form [formGroup]="userForm.state.form" class="login-form" fxLayout="column" fxLayoutAlign="start stretch">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>User</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-select formControlName="userId" nzPlaceHolder="Choose" nzShowSearch>
+            <nz-option
+              *ngFor="let user of userForm.state.allUsers"
+              [nzLabel]="user.userName"
+              [nzValue]="user.id"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-collapse-panel>
+  <nz-collapse-panel [nzActive]="true" [nzHeader]="filterForm.state.title">
+    <!-- <nz-card [nzTitle]="filterForm.state.title"> -->
+    <form nz-form [formGroup]="filterForm.state.form" class="login-form">
+      <div nz-row>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>From Date</nz-form-label>
+            <nz-form-control nzHasFeedback>
+              <nz-date-picker formControlName="fromDate"></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>To Date</nz-form-label>
+            <nz-form-control nzHasFeedback>
+              <nz-date-picker formControlName="toDate"></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      <div nz-row>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>From Time</nz-form-label>
+            <nz-form-control nzHasFeedback>
+              <nz-time-picker formControlName="fromTime" nzFormat="HH:mm"></nz-time-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>To Time</nz-form-label>
+            <nz-form-control nzHasFeedback>
+              <nz-time-picker formControlName="toTime" nzFormat="HH:mm"></nz-time-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      <div class="right">
+        <nz-form-item>
+          <nz-form-control>
+            <button nz-button class="login-form-button" [nzType]="'default'" (click)="filterForm.helpers.resetForm()">
+              Clear Filter
+            </button>
+            <button
+              nz-button
+              class="login-form-button"
+              [nzType]="'primary'"
+              (click)="filterForm.handlers.applyFilter()"
+            >
+              Apply Filter
+            </button>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </form>
+    <!-- </nz-card> -->
+  </nz-collapse-panel>
+</nz-collapse>
+
+<!-- table -->
+<nz-table
+  #table
+  [nzData]="tableConfig.dataSet"
+  [nzSize]="tableConfig.size"
+  [nzTitle]="tableTitle"
+  [nzBordered]="tableConfig.bordered"
+  [nzLoading]="tableConfig.loading"
+>
+  <thead (nzSortChange)="tableConfig.onSortChange($event)">
+    <tr>
+      <th nzShowSort nzSortKey="name">Name</th>
+      <th nzShowSort nzSortKey="description" nzWidth="400px">Description</th>
+      <th nzShowSort nzSortKey="calories">Calories</th>
+      <th nzShowSort nzSortKey="mealDateTime">Date</th>
+      <th nzShowSort nzSortKey="category">Category</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of table.data">
+      <td>{{ data.name | titlecase }}</td>
+      <td>{{ data.description }}</td>
+      <td>{{ data.calories }}</td>
+      <td>{{ data.mealDateTime | date: 'short' }}</td>
+      <td>{{ data.category }}</td>
+      <td>
+        <a (click)="modalConfig.helpers.execute('read', data)"> View </a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a (click)="modalConfig.helpers.execute('update', data)">Edit</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a (click)="modalConfig.helpers.execute('delete', data)">Delete</a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+
+<!-- modal -->
+
+<nz-modal
+  [(nzVisible)]="modalConfig.state.visible"
+  [nzTitle]="modalConfig.state.title"
+  (nzOnCancel)="modalConfig.events.cancel()"
+  (nzOnOk)="modalConfig.events.ok()"
+  [nzOkLoading]="modalConfig.state.isOkLoading"
+  [nzMaskClosable]="modalConfig.state.nzMaskClosable"
+  [nzOkText]="modalConfig.state.nzOkText"
+  [nzOkType]="modalConfig.state.nzOkType"
+>
+  <div *ngIf="false; else modal"></div>
+</nz-modal>
+
+<!-- templates -->
+<!-- table heading -->
+<ng-template #tableTitle>
+  <strong>Manage Meals</strong>
+  <button
+    class="right"
+    nz-button
+    nzSize="small"
+    nzType="primary"
+    nzShape="circle"
+    (click)="modalConfig.helpers.execute('create')"
+  >
+    <i nz-icon type="plus"></i>
+  </button>
+</ng-template>
+
+<!-- modal content -->
+<ng-template #modal>
+  <div
+    *ngIf="
+      modalConfig.state.calleeFn == 'create' ||
+      modalConfig.state.calleeFn == 'update' ||
+      modalConfig.state.calleeFn == 'read'
+    "
+    fxLayout="row"
+    fxLayoutAlign="center center"
+    fxFlexFill
+  >
+    <form nz-form [formGroup]="modalForm.state.form" class="login-form" fxLayout="column" fxLayoutAlign="start stretch">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group> <input type="text" nz-input formControlName="name" placeholder="Pizza" /> </nz-input-group>
+          <nz-form-explain *ngIf="modalForm.state.form.get('name').dirty && modalForm.state.form.get('name').errors">
+            <ng-container *ngIf="modalForm.state.form.get('name').hasError('required')">
+              Please input meal name!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('name').hasError('maxlength')">
+              Name should be at max
+              {{ modalForm.state.form.get('name').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10">Description</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group> <textarea rows="2" nz-input formControlName="description"></textarea> </nz-input-group>
+          <nz-form-explain
+            *ngIf="modalForm.state.form.get('description').dirty && modalForm.state.form.get('description').errors"
+          >
+            <ng-container *ngIf="modalForm.state.form.get('description').hasError('required')">
+              Please input meal description!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('description').hasError('maxlength')">
+              Description should be at max
+              {{ modalForm.state.form.get('description').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Calories</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="number" min="0" nz-input formControlName="calories" placeholder="226" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="modalForm.state.form.get('calories').dirty && modalForm.state.form.get('calories').errors"
+          >
+            <ng-container *ngIf="modalForm.state.form.get('calories').hasError('required')">
+              Please input meal calories!
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('calories').hasError('min')">
+              Calories should be at least {{ modalForm.state.form.get('calories').getError('min')['min'] }}
+            </ng-container>
+            <ng-container *ngIf="modalForm.state.form.get('calories').hasError('max')">
+              Calories should be at most {{ modalForm.state.form.get('calories').getError('max')['max'] }}
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Meal Time</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-date-picker
+            nzShowTime
+            nzFormat="yyyy-MM-dd HH:mm:ss"
+            nzPlaceHolder="Select Time"
+            formControlName="mealDateTime"
+          ></nz-date-picker>
+          <nz-form-explain
+            *ngIf="modalForm.state.form.get('mealDateTime').dirty && modalForm.state.form.get('mealDateTime').errors"
+            >Please input meal time!
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Category</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-select formControlName="category" nzPlaceHolder="Choose">
+            <nz-option
+              *ngFor="let category of modalForm.state.mealCategories"
+              [nzLabel]="category.name"
+              [nzValue]="category.value"
+            ></nz-option>
+          </nz-select>
+          <nz-form-explain
+            *ngIf="modalForm.state.form.get('category').dirty && modalForm.state.form.get('category').errors"
+            >Please input meal category!
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </div>
+  <div *ngIf="modalConfig.state.calleeFn == 'delete'">
+    <i nz-icon class="warning-color size-24px" type="exclamation-circle"></i> Are you sure you want to delete meal
+    <b>{{ modalForm.state.form.get('name').value }}</b> ?
+  </div>
+</ng-template>

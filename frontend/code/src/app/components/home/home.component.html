@@ -1,0 +1,61 @@
+<nz-layout class="app-full-height">
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null" [nzBreakpoint]="'lg'">
+    <div class="logo-container" [routerLink]="['/home']">
+      <img src="assets/calorie-meter-horizontal.png" class="logo" alt="Calorie Meter" />
+    </div>
+    <ul nz-menu [nzTheme]="'dark'" [nzMode]="'inline'" [nzInlineCollapsed]="isCollapsed">
+      <!-- <li nz-submenu>
+        <span title><i nz-icon type="team"></i><span class="nav-text">User</span></span>
+        <ul>
+          <li nz-menu-item>Team 1</li>
+          <li nz-menu-item>Team 2</li>
+        </ul>
+      </li> -->
+      <li nz-menu-item [routerLink]="['/home/user-list']" *ngIf="session.isAuthorized(roleGroups.adminAnduserManager)">
+        <span><i nz-icon type="team"></i><span class="nav-text">User Management</span></span>
+      </li>
+      <li nz-menu-item [routerLink]="['/home/meal-history']" *ngIf="session.isAuthorized(['admin','user'])">
+        <span><i nz-icon type="clock-circle"></i><span class="nav-text">Meals History</span></span>
+      </li>
+      <li nz-menu-item [routerLink]="['/home']" *ngIf="session.isAuthorized(['user'])">
+        <span><i nz-icon type="coffee"></i><span class="nav-text">Meals</span></span>
+      </li>
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-header style="background: #fff; padding:0;">
+      <i
+        class="trigger"
+        nz-icon
+        [type]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
+        (click)="isCollapsed = !isCollapsed"
+      ></i>
+      <div class="right">
+        <nz-dropdown [nzTrigger]="'click'" [nzPlacement]="'bottomRight'">
+          <div nz-dropdown class="trigger trigger-text">
+            <nz-avatar nzIcon="user"></nz-avatar> &nbsp;{{ session.getUserFullName() }}
+
+            <!-- <i class="trigger" nz-icon [type]="'setting'"></i> -->
+          </div>
+
+          <ul nz-menu>
+            <li nz-menu-item (click)="modifyProfile()">
+              <i class="trigger" nz-icon [type]="'user'"></i>Modify Profile
+            </li>
+            <li nz-menu-divider></li>
+            <li nz-menu-item (click)="logout()"><i class="trigger" nz-icon [type]="'logout'"></i>Logout</li>
+          </ul>
+        </nz-dropdown>
+      </div>
+    </nz-header>
+    <nz-content style="margin:0 16px;">
+      <!-- <nz-breadcrumb style="margin:16px 0;">
+        <nz-breadcrumb-item>User</nz-breadcrumb-item>
+        <nz-breadcrumb-item>Bill</nz-breadcrumb-item>
+      </nz-breadcrumb> -->
+      <div style="margin:16px 0;"></div>
+      <div style="padding:24px; background: #fff; min-height: 86vh"><router-outlet></router-outlet></div>
+    </nz-content>
+    <!-- <nz-footer style="text-align: center;">Calorie Meter © 2018</nz-footer> -->
+  </nz-layout>
+</nz-layout>

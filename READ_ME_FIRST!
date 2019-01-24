@@ -1,0 +1,5 @@
+## for setting up new project
+1. set myproject in dcp and dcd
+2. set the myproject in dev.conf and prod.conf in the nginx/sites-enabled and in cors.conf
+3. Make sure that the angular.json output directory is dist and not dist/project-name
+4. change the db name in the ormconfig.json in backend/code/ormconfig.json

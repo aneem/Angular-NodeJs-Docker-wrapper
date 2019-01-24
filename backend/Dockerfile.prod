@@ -1,0 +1,16 @@
+FROM node:10.14-alpine
+
+ENV HOME /usr/local/api
+WORKDIR $HOME
+
+COPY $PWD/entrypoint.prod.sh $HOME
+
+COPY $PWD/code/package.json $HOME
+
+RUN rm -rf node_modules && npm install
+
+COPY $PWD/code $HOME
+
+EXPOSE 3000
+
+ENTRYPOINT ["sh", "entrypoint.prod.sh"]

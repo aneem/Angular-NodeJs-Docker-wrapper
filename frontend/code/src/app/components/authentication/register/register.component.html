@@ -1,0 +1,143 @@
+<div class="app-full-height" fxLayout="row" fxLayoutAlign="center center" fxFlexFill>
+  <nz-card>
+    <button nz-button nzType="circle" (click)="goBack()"><i nz-icon type="left"></i></button>
+    <img src="assets/calorie-meter.png" class="calorie-image" alt="Calorie Meter" />
+    <form nz-form [formGroup]="validateForm" class="login-form" fxLayout="column" fxLayoutAlign="start stretch">
+      <nz-divider nzText="Register"></nz-divider>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>First Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="text" nz-input formControlName="firstName" placeholder="John" />
+          </nz-input-group>
+          <nz-form-explain *ngIf="validateForm.get('firstName').dirty && validateForm.get('firstName').errors">
+            <ng-container *ngIf="validateForm.get('firstName').hasError('required')">
+              Please input meal firstName!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('firstName').hasError('maxlength')">
+              FirstName should be at max
+              {{ validateForm.get('firstName').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10">Middle Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="text" nz-input formControlName="middleName" placeholder="Salsbury" />
+            <nz-form-explain *ngIf="validateForm.get('middleName').dirty && validateForm.get('middleName').errors">
+              <ng-container *ngIf="validateForm.get('middleName').hasError('required')">
+                Please input meal middleName!
+              </ng-container>
+              <ng-container *ngIf="validateForm.get('middleName').hasError('maxlength')">
+                MiddleName should be at max
+                {{ validateForm.get('middleName').getError('maxlength')['requiredLength'] }} characters.
+              </ng-container>
+            </nz-form-explain>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Last Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group> <input type="text" nz-input formControlName="lastName" placeholder="Doe" /> </nz-input-group>
+          <nz-form-explain *ngIf="validateForm.get('lastName').dirty && validateForm.get('lastName').errors">
+            <ng-container *ngIf="validateForm.get('lastName').hasError('required')">
+              Please input meal lastName!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('lastName').hasError('maxlength')">
+              lastName should be at max
+              {{ validateForm.get('lastName').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Email</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="text" nz-input formControlName="email" placeholder="john.doe@gmail.com" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="
+              (validateForm.get('email').dirty && validateForm.get('email').errors) || validateForm.get('email').pending
+            "
+          >
+            <ng-container *ngIf="validateForm.get('email').hasError('required')">
+              Please input your email!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('email').hasError('duplicated')">
+              This email is already registered!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('email').pending"> Validating... </ng-container>
+            <ng-container *ngIf="validateForm.get('email').hasError('email')">
+              The input is not valid E-mail!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('email').hasError('maxlength')">
+              Email should be at max {{ validateForm.get('email').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>User Name</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="text" nz-input formControlName="userName" placeholder="john.doe" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="
+              (validateForm.get('userName').dirty && validateForm.get('userName').errors) ||
+              validateForm.get('userName').pending
+            "
+          >
+            <ng-container *ngIf="validateForm.get('userName').hasError('required')">
+              Please input your username!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('userName').hasError('duplicated')">
+              The username is already registered!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('userName').hasError('invalidUserNameCharCheck')">
+              {{ validateForm.get('userName').getError('invalidUserNameCharCheck')['message'] }}
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('userName').hasError('maxlength')">
+              UserName should be at max
+              {{ validateForm.get('userName').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('userName').pending"> Validating... </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="10" nzRequired>Password</nz-form-label>
+        <nz-form-control [nzSpan]="14" nzHasFeedback>
+          <nz-input-group>
+            <input type="password" nz-input formControlName="password" placeholder="your secret" />
+          </nz-input-group>
+          <nz-form-explain *ngIf="validateForm.get('password').dirty && validateForm.get('password').errors">
+            <ng-container *ngIf="validateForm.get('password').hasError('required')">
+              Please input your password!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('password').hasError('minlength')">
+              Password should have at least
+              {{ validateForm.get('password').getError('minlength')['requiredLength'] }} characters!
+            </ng-container>
+            <ng-container *ngIf="validateForm.get('password').hasError('maxlength')">
+              Password should be at max
+              {{ validateForm.get('password').getError('maxlength')['requiredLength'] }} characters.
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control>
+          <button nz-button class="login-form-button" [nzType]="'primary'" (click)="onSubmit()">Register</button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-card>
+</div>

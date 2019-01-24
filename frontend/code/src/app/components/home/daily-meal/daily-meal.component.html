@@ -1,0 +1,215 @@
+<div
+  [ngClass]="{
+    'green-background': tableConfig.helpers.isCalorieWithinLimit() && tableConfig.state.dataSet.length > 0,
+    'red-background': !tableConfig.helpers.isCalorieWithinLimit() && tableConfig.state.dataSet.length > 0
+  }"
+>
+  <div style="text-align: center" fxLayout="column" fxLayoutAlign="center center">
+    <nz-progress
+      [nzPercent]="tableConfig.helpers.getConsumedCaloriesPercentage()"
+      [nzWidth]="70"
+      *ngIf="tableConfig.helpers.isCalorieWithinLimit()"
+      [nzShowInfo]="true"
+      nzType="circle"
+      [nzFormat]="tableConfig.helpers.getConsumedCaloriesPercentage"
+    ></nz-progress>
+    <nz-progress
+      [nzPercent]="tableConfig.helpers.getConsumedCaloriesPercentage()"
+      [nzWidth]="70"
+      *ngIf="!tableConfig.helpers.isCalorieWithinLimit()"
+      nzStatus="exception"
+      [nzShowInfo]="true"
+      nzType="circle"
+      [nzFormat]="tableConfig.helpers.getConsumedCaloriesPercentage"
+    ></nz-progress>
+    Calories Consumed: {{ tableConfig.helpers.getConsumedCalories() }}/ {{ session.getUser().noOfDailyCalories }}
+  </div>
+
+  <div style="text-align: center;">
+    <span style=" font-size:2rem">Daily Meals Consumed</span>
+    <button class="right" nz-button nzType="primary" (click)="modalConfig.helpers.execute('create')">Add Meals</button>
+  </div>
+
+  <div nz-row *ngIf="tableConfig.state.dataSet.length > 0; else noMeals">
+    <div nz-col [nzSpan]="12" *ngFor="let data of tableConfig.state.dataSet">
+      <nz-card [nzActions]="[actionEdit, actionDelete]" style="margin:5px">
+        <nz-card-meta [nzTitle]="cardTitle" [nzDescription]="cardDescription"></nz-card-meta>
+      </nz-card>
+      <ng-template #cardTitle
+        >{{ data.name | titlecase }}
+        <nz-tag [nzColor]="modalForm.state.mealColors[data.category]" class="right">
+          {{ data.category }} ({{ data.mealDateTime | date: 'shortTime' }})</nz-tag
+        >
+      </ng-template>
+      <ng-template #cardDescription>
+        <div style="height: 100px">
+          Calories: {{ data.calories }} <br />
+          <div style="overflow-y: auto; height: 80px;">{{ data.description }}</div>
+        </div>
+      </ng-template>
+      <ng-template #actionEdit>
+        <div (click)="modalConfig.helpers.execute('update', data)"><i nz-icon type="edit"></i></div>
+      </ng-template>
+
+      <ng-template #actionDelete>
+        <div (click)="modalConfig.helpers.execute('delete', data)"><i nz-icon type="delete"></i></div>
+      </ng-template>
+    </div>
+  </div>
+  <ng-template #noMeals> <div style="text-align: center; line-height: 400px;">No meals added today</div> </ng-template>
+
+  <!-- <nz-list
+    class="demo-loadmore-list"
+    [nzDataSource]="tableConfig.state.dataSet"
+    [nzItemLayout]="'horizontal'"
+    [nzLoading]="tableConfig.state.loading"
+    [nzRenderItem]="item"
+  >
+    <ng-template #item let-item>
+      <nz-list-item [nzActions]="[editAction, moreAction]">
+        <nz-list-item-meta [nzTitle]="title" [nzDescription]="item.description"> </nz-list-item-meta>
+        <ng-template #editAction><a (click)="modalConfig.helpers.execute('update', item)">edit</a></ng-template>
+        <ng-template #moreAction><a (click)="modalConfig.helpers.execute('delete', item)">delete</a></ng-template>
+        <ng-template #title>
+          {{ item.name | titlecase }}
+          <nz-tag [nzColor]="modalForm.state.mealColors[item.category]">{{ item.category }}</nz-tag>
+          <nz-tag>{{ item.mealDateTime | date: 'shortTime' }}</nz-tag>
+        </ng-template>
+      </nz-list-item>
+    </ng-template>
+  </nz-list> -->
+
+  <!-- templates -->
+  <!-- table heading -->
+  <ng-template #tableTitle>
+    <strong>Manage Meals</strong>
+    <button
+      class="right"
+      nz-button
+      nzSize="small"
+      nzType="primary"
+      nzShape="circle"
+      (click)="modalConfig.helpers.execute('create')"
+    >
+      <i nz-icon type="plus"></i>
+    </button>
+  </ng-template>
+
+  <nz-modal
+    [(nzVisible)]="modalConfig.state.visible"
+    [nzTitle]="modalConfig.state.title"
+    (nzOnCancel)="modalConfig.events.cancel()"
+    (nzOnOk)="modalConfig.events.ok()"
+    [nzOkLoading]="modalConfig.state.isOkLoading"
+    [nzMaskClosable]="modalConfig.state.nzMaskClosable"
+    [nzOkText]="modalConfig.state.nzOkText"
+    [nzOkType]="modalConfig.state.nzOkType"
+  >
+    <div *ngIf="false; else modal"></div>
+  </nz-modal>
+
+  <ng-template #modal>
+    <div
+      *ngIf="
+        modalConfig.state.calleeFn == 'create' ||
+        modalConfig.state.calleeFn == 'update' ||
+        modalConfig.state.calleeFn == 'read'
+      "
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      fxFlexFill
+    >
+      <form
+        nz-form
+        [formGroup]="modalForm.state.form"
+        class="login-form"
+        fxLayout="column"
+        fxLayoutAlign="start stretch"
+      >
+        <nz-form-item>
+          <nz-form-label [nzSpan]="10" nzRequired>Name</nz-form-label>
+          <nz-form-control [nzSpan]="14" nzHasFeedback>
+            <nz-input-group> <input type="text" nz-input formControlName="name" placeholder="Pizza" /> </nz-input-group>
+            <nz-form-explain *ngIf="modalForm.state.form.get('name').dirty && modalForm.state.form.get('name').errors">
+              <ng-container *ngIf="modalForm.state.form.get('name').hasError('required')">
+                Please input meal name!
+              </ng-container>
+              <ng-container *ngIf="modalForm.state.form.get('name').hasError('maxlength')">
+                Name should be at max {{ modalForm.state.form.get('name').getError('maxlength')['requiredLength'] }} characters.
+              </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="10">Description</nz-form-label>
+          <nz-form-control [nzSpan]="14" nzHasFeedback>
+            <nz-input-group> <textarea rows="2" nz-input formControlName="description"></textarea> </nz-input-group>
+            <nz-form-explain *ngIf="modalForm.state.form.get('description').dirty && modalForm.state.form.get('description').errors">
+                <ng-container *ngIf="modalForm.state.form.get('description').hasError('required')">
+                  Please input meal description!
+                </ng-container>
+                <ng-container *ngIf="modalForm.state.form.get('description').hasError('maxlength')">
+                  Description should be at max {{ modalForm.state.form.get('description').getError('maxlength')['requiredLength'] }} characters.
+                </ng-container>
+              </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="10" nzRequired>Calories</nz-form-label>
+          <nz-form-control [nzSpan]="14" nzHasFeedback>
+            <nz-input-group>
+              <input type="number" min="0" nz-input formControlName="calories" placeholder="226" />
+            </nz-input-group>
+            <nz-form-explain
+              *ngIf="modalForm.state.form.get('calories').dirty && modalForm.state.form.get('calories').errors"
+            >
+              <ng-container *ngIf="modalForm.state.form.get('calories').hasError('required')">
+                Please input meal calories!
+              </ng-container>
+              <ng-container *ngIf="modalForm.state.form.get('calories').hasError('min')">
+                Calories should be at least {{ modalForm.state.form.get('calories').getError('min')['min'] }}
+              </ng-container>
+              <ng-container *ngIf="modalForm.state.form.get('calories').hasError('max')">
+                  Calories should be at most {{ modalForm.state.form.get('calories').getError('max')['max'] }}
+                </ng-container>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="10" nzRequired>Meal Time</nz-form-label>
+          <nz-form-control [nzSpan]="14" nzHasFeedback>
+            <nz-time-picker formControlName="mealDateTime" nzFormat="HH:mm" style="width:100%"></nz-time-picker>
+            <nz-form-explain
+              *ngIf="modalForm.state.form.get('mealDateTime').dirty && modalForm.state.form.get('mealDateTime').errors"
+              >Please input meal time!
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSpan]="10" nzRequired>Category</nz-form-label>
+          <nz-form-control [nzSpan]="14" nzHasFeedback>
+            <nz-select formControlName="category" nzPlaceHolder="Choose">
+              <nz-option
+                *ngFor="let category of modalForm.state.mealCategories"
+                [nzLabel]="category.name"
+                [nzValue]="category.value"
+              ></nz-option>
+            </nz-select>
+            <nz-form-explain
+              *ngIf="modalForm.state.form.get('category').dirty && modalForm.state.form.get('category').errors"
+              >Please input meal category!
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+    <div *ngIf="modalConfig.state.calleeFn == 'delete'">
+      <i nz-icon class="warning-color size-24px" type="exclamation-circle"></i> Are you sure you want to delete meal
+      <b>{{ modalForm.state.form.get('name').value }}</b> ?
+    </div>
+  </ng-template>
+</div>
